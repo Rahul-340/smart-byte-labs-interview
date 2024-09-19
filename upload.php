@@ -13,18 +13,14 @@ if (isset($_POST['submit'])) {
             echo "Please upload a valid .txt file.";
             exit;
         }
-
-        // Read the entire file into an array
         $fileLines = file($fileTmpPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
         $totalLines = count($fileLines);
         // echo "<pre>";
         // print_r($fileLines);die;
 
-        // Define number of sections
         $numSections = 3;
         $chunkSize = ceil($totalLines / $numSections);
 
-        // Process each section
         $totalFileWordCount = 0;
         $results = [];
         for ($i = 0; $i < $numSections; $i++) {
@@ -55,7 +51,6 @@ if (isset($_POST['submit'])) {
             ];
         }
 
-        // Insert file details and line counts into the database
         $sql = "INSERT INTO uploads (file_name, line_count) VALUES ('$fileName', $totalLines)";
         if ($conn->query($sql) === TRUE) {
             echo "File '$fileName' uploaded successfully.<br>";
@@ -67,7 +62,7 @@ if (isset($_POST['submit'])) {
                 // print_r($result['paragraphs']);die;
                 foreach ($result['paragraphs'] as $index => $paragraph) {
                     $paragraphLower = strtolower($paragraph);
-                    $paragraphLower = preg_replace('/[^\w\s]/', '', $paragraphLower); // Remove punctuation
+                    $paragraphLower = preg_replace('/[^\w\s]/', '', $paragraphLower);
                     $words = explode(' ', $paragraphLower);
 
                     $wordCount = [];
@@ -92,14 +87,8 @@ if (isset($_POST['submit'])) {
             }
             echo "Total Word Count: $totalFileWordCount<br>";
 
-        } else {
-            echo "Error: Could not save file details to the database. " . $conn->error;
         }
-    } else {
-        echo "Error: Please select a file to upload.";
     }
-} else {
-    echo "Error: Invalid request.";
 }
 
 $conn->close();
